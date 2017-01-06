@@ -4,18 +4,18 @@
 FROM phusion/baseimage:0.9.18
 MAINTAINER GoCD <go-cd-dev@googlegroups.com>
 
-ARG GO_VERSION="16.8.0-3929"
+ARG GO_VERSION="16.9.0-4001"
 ARG DOWNLOAD_URL="https://download.gocd.io/binaries"
 
 RUN rm -rf /etc/service/sshd /etc/my_init.d/00_regen_ssh_host_keys.sh \
+    && add-apt-repository -y ppa:openjdk-r/ppa \
     && apt-get update \
-    && apt-get install -y -q unzip openjdk-7-jre-headless git mercurial subversion \
-    && mkdir /etc/service/go-server
+    && apt-get install -y -q unzip openjdk-8-jre-headless git mercurial subversion \
+    && mkdir /etc/service/go-server \
+    && curl $DOWNLOAD_URL/$GO_VERSION/deb/go-server_${GO_VERSION}_all.deb -o /tmp/go-server.deb
 
 ADD go-common-scripts.sh /etc/service/go-server/go-common-scripts.sh
 ADD go-server-start.sh /etc/service/go-server/run
-
-ADD $DOWNLOAD_URL/$GO_VERSION/deb/go-server_${GO_VERSION}_all.deb /tmp/go-server.deb
 
 RUN groupadd -r go \
     && useradd -r -c "Go User" -g "go" -d "/var/go" -m -s "/bin/bash" go \
